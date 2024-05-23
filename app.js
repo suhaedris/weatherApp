@@ -7,7 +7,7 @@ function getWeather(){
         return;
     }
     const currentWeatherurl = "https://api.openweathermap.org/data/2.5/weather?q="+ city+ "&appid="+ apiKey+"&units=metric";
-    const Geonames = "http://api.geonames.org/searchJSON?q="+city +"&maxRows=5&username=suha.edris";
+    const forecasturl = "https://api.openweathermap.org/data/2.5/forecast?q="+city +"&appid="+ apiKey+"&units=metric";
     fetch(currentWeatherurl)
     .then(response => response.json())
     .then(data => {
@@ -16,6 +16,15 @@ function getWeather(){
     .catch(error => {
         console.error('error fetching current weather data:', error);
         alert("Error fetching current weather data. Please try again");
+    });
+    fetch(forecasturl)
+    .then(response => response.json())
+    .then(data => {
+        displayHourlyForcast(data.list);
+    })
+    .catch(error => {
+        console.error('error fetching hourly forcast data:', error);
+        alert("Error fetching hourly forcast data. Please try again");
     });
 }   
 function displayweather(data){
@@ -45,6 +54,26 @@ function displayweather(data){
     }
 
 }
+function displayHourlyForcast(hourlydata){
+    const hourlyForcastDiv= document.getElementById('hourly-forcast');
+    const next24Hours = hourlydata.slice(0,8);
+
+    next24Hours.forEach(item => {
+        const dateTime = new Date(item.dt *1000);
+        const hour= dateTime.getHours();
+        const temprature= item.main.temp;
+        const iconcode= item.weather[0].icon;
+        const iconurl= "https://openweathermap.org/img/wn/"+iconcode+"@2x.png";
+
+        const hourlyItemHtml= `<div class="hourly-item" >
+        <span> ${hour}:00</span>
+        <img src="${iconurl}" alt="Hourly weather icon">
+        <span>${temprature} ْC</span>
+        </div> `;
+
+        hourlyForcastDiv.innerHTML+=hourlyItemHtml;
+    });
+}
 
 // function local() {
 // const url = 'https://ip-geo-location.p.rapidapi.com/ip/check?format=json';
@@ -69,5 +98,4 @@ function showImage() {
     weatherIcon.style.display='block'; 
 
 }
-
 
